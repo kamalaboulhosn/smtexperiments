@@ -25,11 +25,11 @@ data "github_repository_file" "verify-udf-file" {
 resource "google_pubsub_topic" "verified-topic" {
   name = "verified-topic"
   message_transforms {
-		javascript_udf {
-			function_name = regex(".+/(?P<file>\\w+)\\.js", "${data.github_repository_file.verify-udf-file.file}")["file"]
-			code = data.github_repository_file.verify-udf-file.content
-		}
-	}
+    javascript_udf {
+      function_name = regex(".+/(?P<file>\\w+)\\.js", "${data.github_repository_file.verify-udf-file.file}")["file"]
+      code          = data.github_repository_file.verify-udf-file.content
+    }
+  }
 }
 
 variable "filter-udf-with-includes" {
@@ -47,12 +47,12 @@ data "github_repository_file" "filter-udf-with-includes-files" {
 }
 
 resource "google_pubsub_subscription" "filtered-by-location-sub" {
-  name = "filtered-by-location-sub"
+  name  = "filtered-by-location-sub"
   topic = google_pubsub_topic.verified-topic.name
   message_transforms {
-		javascript_udf {
-			function_name = regex(".+/(?P<file>\\w+)\\.js", "${var.filter-udf-with-includes[0]}")["file"]
-			code = join("\n", [for k, f in data.github_repository_file.filter-udf-with-includes-files : f.content])
-		}
-	}
+    javascript_udf {
+      function_name = regex(".+/(?P<file>\\w+)\\.js", "${var.filter-udf-with-includes[0]}")["file"]
+      code          = join("\n", [for k, f in data.github_repository_file.filter-udf-with-includes-files : f.content])
+    }
+  }
 }
